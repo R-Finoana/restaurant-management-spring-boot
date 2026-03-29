@@ -19,6 +19,7 @@ public class IngredientRepository {
                        name,
                        category,
                        price
+                from ingredient;
                 """;
 
         return jdbcTemplate.query(sql, (rs, rowNum) -> {
