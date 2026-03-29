@@ -32,4 +32,25 @@ public class IngredientRepository {
             return ing;
         });
     }
+
+    public Ingredient findIngredientById(int id){
+        String sql= """
+                select id,
+                       name,
+                       category,
+                       price
+                from ingredient
+                where id = ?;
+                """;
+
+        return jdbcTemplate.queryForObject(sql, (rs, rowNum) -> {
+            Ingredient ing = new Ingredient();
+            ing.setId(rs.getInt("id"));
+            ing.setName(rs.getString("name"));
+            ing.setCategory(CategoryEnum.valueOf(rs.getString("category")));
+            ing.setPrice(rs.getDouble("price"));
+
+            return ing;
+        }, id);
+    }
 }
