@@ -12,7 +12,6 @@ import java.util.List;
 @AllArgsConstructor
 public class IngredientService {
     private final IngredientRepository repository;
-    private final IngredientService service;
 
     public List<Ingredient> getAllIngredients() throws SQLException {
         return repository.findIngredient();
