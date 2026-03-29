@@ -16,4 +16,8 @@ public class IngredientService {
     public List<Ingredient> getAllIngredients() throws SQLException {
         return repository.findIngredient();
     }
+
+    public Ingredient getIngredientById(int id){
+        return repository.findIngredientById(id);
+    }
 }
