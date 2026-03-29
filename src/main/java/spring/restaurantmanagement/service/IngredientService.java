@@ -3,6 +3,7 @@ package spring.restaurantmanagement.service;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import spring.restaurantmanagement.entity.Ingredient;
+import spring.restaurantmanagement.exception.IngredientNotFoundException;
 import spring.restaurantmanagement.repository.IngredientRepository;
 
 import java.sql.SQLException;
@@ -17,7 +18,7 @@ public class IngredientService {
         return repository.findIngredient();
     }
 
-    public Ingredient getIngredientById(int id){
+    public Ingredient getIngredientById(int id) throws IngredientNotFoundException {
         return repository.findIngredientById(id);
     }
 }
