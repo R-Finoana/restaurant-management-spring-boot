@@ -73,4 +73,10 @@ public class DishRepository {
             ps.setInt(2, ingredient.getId());
         });
     }
+
+    public boolean dishExists(int dishId){
+        String sql ="SELECT id, name, selling_price from dish WHERE id = ?";
+        Integer count = jdbcTemplate.queryForObject(sql, Integer.class, dishId);
+    return count != null && count > 0;
+    }
 }
