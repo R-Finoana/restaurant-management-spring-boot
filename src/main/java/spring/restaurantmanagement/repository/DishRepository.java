@@ -54,7 +54,7 @@ public class DishRepository {
         });
     }
 
-    private void detachIngredients(Integer dishId) {
+    public void detachIngredients(Integer dishId) {
         String sql="DELETE FROM dish_ingredient WHERE id_dish = ?";
 
         jdbcTemplate.update(sql, dishId);
