@@ -67,13 +67,12 @@ public class IngredientRepository {
         String sql= """
                 select
                     stock_movement.id_ingredient,
-                    ingredient.name,
                     sum(CASE WHEN stock_movement.type='OUT' THEN (stock_movement.quantity*(-1)) ELSE stock_movement.quantity END) as actual_quantity,
-                    unit
+                    stock_movement.unit
                 from stock_movement join ingredient on stock_movement.id_ingredient=ingredient.id
                 where stock_movement.creation_datetime<= ?
                   and stock_movement.id_ingredient= ?
-                group by (id_ingredient, stock_movement.unit, ingredient.name);
+                group by stock_movement.id_ingredient, stock_movement.unit;
                 """;
 
         try{
@@ -83,7 +82,7 @@ public class IngredientRepository {
             stock.setUnit(UnitTypeEnum.valueOf(rs.getString("unit")));
 
             return stock;
-            }, id);
+            }, t, id);
         } catch (EmptyResultDataAccessException e){
             throw new IngredientNotFoundException(id);
         }
