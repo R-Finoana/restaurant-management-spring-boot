@@ -15,4 +15,11 @@ public class GlobalExceptionHandler {
                 .status(HttpStatus.NOT_FOUND)
                 .body(e.getMessage());
     }
+
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    public ResponseEntity<String> handleMissingParam(MissingServletRequestParameterException e){
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body("Either mandatory query parameter `at` or `unit` is not provided.");
+    }
 }
