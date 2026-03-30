@@ -10,6 +10,7 @@ import spring.restaurantmanagement.entity.StockValue;
 import spring.restaurantmanagement.entity.UnitTypeEnum;
 import spring.restaurantmanagement.exception.IngredientNotFoundException;
 
+import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.List;
 
@@ -82,7 +83,7 @@ public class IngredientRepository {
             stock.setUnit(UnitTypeEnum.valueOf(rs.getString("unit")));
 
             return stock;
-            }, t, id);
+            }, Timestamp.from(t), id);
         } catch (EmptyResultDataAccessException e){
             throw new IngredientNotFoundException(id);
         }
