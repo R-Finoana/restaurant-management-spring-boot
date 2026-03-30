@@ -22,4 +22,11 @@ public class GlobalExceptionHandler {
                 .status(HttpStatus.BAD_REQUEST)
                 .body("Either mandatory query parameter `at` or `unit` is not provided.");
     }
+
+    @ExceptionHandler(DIshNotFoundException.class)
+    public ResponseEntity<String> handleDishNotFound(DIshNotFoundException e){
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(e.getMessage());
+    }
 }
