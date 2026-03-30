@@ -7,6 +7,9 @@ import spring.restaurantmanagement.entity.CategoryEnum;
 import spring.restaurantmanagement.entity.Dish;
 import spring.restaurantmanagement.entity.Ingredient;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -48,6 +51,26 @@ public class DishRepository {
             dish.setIngredientList(ingredientList);
 
             return dish;
+        });
+    }
+
+    private void detachIngredients(Integer dishId) {
+        String sql="DELETE FROM dish_ingredient WHERE id_dish = ?";
+
+        jdbcTemplate.update(sql, dishId);
+    }
+
+    public void attachIngredients(Integer dishId, List<Ingredient> ingredients){
+        String sql= """
+                INSERT INTO dish_ingredient (id_dish, id_ingredient, quantity_required, unit)
+                SELECT ?, id, quantity_required, unit
+                FROM ingredient
+                WHERE id = ?
+                """;
+
+        jdbcTemplate.batchUpdate(sql, ingredients, ingredients.size(), (ps, ingredient) -> {
+            ps.setInt(1, dishId);
+            ps.setInt(2, ingredient.getId());
         });
     }
 }
