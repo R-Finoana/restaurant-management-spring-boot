@@ -27,14 +27,9 @@ public class IngredientController {
     }
 
     @GetMapping("/ingredients/{id}")
-    public ResponseEntity<?> getIngredientById(@PathVariable int id){
-        try{
-            return ResponseEntity.ok(service.getIngredientById(id));
-        } catch (IngredientNotFoundException e){
-            return ResponseEntity
-                    .status(HttpStatus.NOT_FOUND)
-                    .body(e.getMessage());
-        }
+    public ResponseEntity<?> getIngredientById(@PathVariable int id) throws IngredientNotFoundException {
+        return ResponseEntity.ok(service.getIngredientById(id));
+
     }
 
     @GetMapping("/ingredients/{id}/stock")
