@@ -203,4 +203,61 @@ public class DishRepository {
             throw new RuntimeException(e);
         }
     }
+
+    public List<Dish> findFilteredDishes(Double priceOver, Double priceUnder, String name) {
+        StringBuilder sql = new StringBuilder("""
+        SELECT id, name, dish_type, selling_price 
+        FROM dish 
+        WHERE 1=1
+        """);
+
+        List<Object> params = new ArrayList<>();
+
+        if (priceOver != null) {
+            sql.append(" AND selling_price > ?");
+            params.add(priceOver);
+        }
+
+        if (priceUnder != null) {
+            sql.append(" AND selling_price < ?");
+            params.add(priceUnder);
+        }
+
+        if (name != null && !name.trim().isEmpty()) {
+            sql.append(" AND name ILIKE ?");
+            params.add("%" + name.trim() + "%");
+        }
+
+        sql.append(" ORDER BY name ASC");
+
+        List<Dish> dishes = new ArrayList<>();
+
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+
+            for (int i = 0; i < params.size(); i++) {
+                ps.setObject(i + 1, params.get(i));
+            }
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Dish d = new Dish();
+                    d.setId(rs.getInt("id"));
+                    d.setName(rs.getString("name"));
+                    d.setDishType(DishTypeEnum.valueOf(rs.getString("dish_type")));
+                    d.setSellingPrice(rs.getObject("selling_price") == null
+                            ? null : rs.getDouble("selling_price"));
+                    dishes.add(d);
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Error while getting filtered dishes", e);
+        }
+
+        for (Dish dish : dishes) {
+            dish.setIngredientList(findIngredientsByDishId(dish.getId()));
+        }
+
+        return dishes;
+    }
 }
