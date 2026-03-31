@@ -19,8 +19,13 @@ public class DishController {
     private final DishService service;
 
     @GetMapping("/dishes")
-    public ResponseEntity<List<Dish>> getDishes(){
-        return ResponseEntity.ok(service.getAllDishes());
+    public ResponseEntity<List<Dish>> getDishes(
+            @RequestParam(required = false) Double priceOver,
+            @RequestParam(required = false) Double priceUnder,
+            @RequestParam(required = false) String name) {
+
+        List<Dish> dishes = service.getFilteredDishes(priceOver, priceUnder, name);
+        return ResponseEntity.ok(dishes);
     }
 
     @PutMapping("/dishes/{id}/ingredients")
