@@ -15,7 +15,7 @@ import java.util.List;
 @Service
 @AllArgsConstructor
 public class DishService {
-    private final DishRepository repository;
+    DishRepository repository;
 
     public List<Dish> getAllDishes(){
         return repository.findDish();
@@ -40,5 +40,9 @@ public class DishService {
             }
         }
         return repository.saveDishes(dishes);
+    }
+
+    public List<Dish> getFilteredDishes(Double priceOver, Double priceUnder, String name) {
+        return repository.findFilteredDishes(priceOver, priceUnder, name);
     }
 }
