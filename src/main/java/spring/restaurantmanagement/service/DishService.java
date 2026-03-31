@@ -3,9 +3,11 @@ package spring.restaurantmanagement.service;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import spring.restaurantmanagement.entity.CreateDish;
 import spring.restaurantmanagement.entity.Dish;
 import spring.restaurantmanagement.entity.Ingredient;
 import spring.restaurantmanagement.exception.DIshNotFoundException;
+import spring.restaurantmanagement.exception.DishAlreadyExistsException;
 import spring.restaurantmanagement.repository.DishRepository;
 
 import java.util.List;
@@ -29,5 +31,14 @@ public class DishService {
             repository.attachIngredients(dishId, ingredients);
         }
         return repository.findIngredientsByDishId(dishId);
+    }
+
+    public List<Dish> createDishes(List<CreateDish> dishes) {
+        for (CreateDish d : dishes) {
+            if (repository.dishNameExists(d.getName())) {
+                throw new DishAlreadyExistsException(d.getName());
+            }
+        }
+        return repository.saveDishes(dishes);
     }
 }
