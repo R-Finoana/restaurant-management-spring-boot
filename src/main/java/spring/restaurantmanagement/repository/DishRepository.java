@@ -49,6 +49,25 @@ public class DishRepository {
 
         return dishes;
     }
+/*
+    public List<Ingredient> findIngredientsByDishId(int dishId) {
+        String sql = """
+            select i.id, i.name, i.category, i.price
+            from ingredient i
+            join dish_ingredient di on di.id_ingredient = i.id
+            where di.id_dish = ?
+            """;
+        return jdbcTemplate.query(sql, (rs, rowNum) -> {
+            Ingredient ing = new Ingredient();
+            ing.setId(rs.getInt("id"));
+            ing.setName(rs.getString("name"));
+            ing.setCategory(CategoryEnum.valueOf(rs.getString("category")));
+            ing.setPrice(rs.getDouble("price"));
+            return ing;
+        }, dishId);
+    }
+
+ */
 
     public void detachIngredients(Integer dishId) {
         String sql="DELETE FROM dish_ingredient WHERE id_dish = ?";
@@ -58,10 +77,8 @@ public class DishRepository {
 
     public void attachIngredients(Integer dishId, List<Ingredient> ingredients){
         String sql= """
-                INSERT INTO dish_ingredient (id_dish, id_ingredient, quantity_required, unit)
-                SELECT ?, id, quantity_required, unit
-                FROM ingredient
-                WHERE id = ?
+                INSERT INTO dish_ingredient (id_dish, id_ingredient)
+                VALUES (?, ?)
                 """;
 
         jdbcTemplate.batchUpdate(sql, ingredients, ingredients.size(), (ps, ingredient) -> {
@@ -71,7 +88,7 @@ public class DishRepository {
     }
 
     public boolean dishExists(int dishId){
-        String sql ="SELECT id, name, selling_price from dish WHERE id = ?";
+        String sql ="SELECT id from dish WHERE id = ?";
         Integer count = jdbcTemplate.queryForObject(sql, Integer.class, dishId);
     return count != null && count > 0;
     }
