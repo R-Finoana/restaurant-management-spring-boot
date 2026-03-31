@@ -20,7 +20,7 @@ public class DishService {
     }
 
     @Transactional
-    public void updateDishIngredients(int dishId, List<Ingredient> ingredients){
+    public List<Ingredient> updateDishIngredients(int dishId, List<Ingredient> ingredients){
         if(!repository.dishExists(dishId)){
             throw new DIshNotFoundException(dishId);
         }
@@ -28,5 +28,6 @@ public class DishService {
         if(!ingredients.isEmpty()){
             repository.attachIngredients(dishId, ingredients);
         }
+        return repository.findIngredientsByDishId(dishId);
     }
 }
