@@ -15,4 +15,5 @@ public class Dish {
     private String name;
     private Double sellingPrice;
     private List<Ingredient> ingredientList;
+    private DishTypeEnum dishType;
 }
