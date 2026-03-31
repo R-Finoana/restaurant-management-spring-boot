@@ -4,9 +4,11 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import spring.restaurantmanagement.entity.CreateDish;
 import spring.restaurantmanagement.entity.Dish;
 import spring.restaurantmanagement.entity.Ingredient;
 import spring.restaurantmanagement.exception.DIshNotFoundException;
+import spring.restaurantmanagement.exception.DishAlreadyExistsException;
 import spring.restaurantmanagement.service.DishService;
 
 import java.util.List;
@@ -30,5 +32,17 @@ public class DishController {
         }
         List<Ingredient> list = service.updateDishIngredients(id, ingredients);
         return ResponseEntity.ok(list);
+    }
+
+    @PostMapping("/dishes")
+    public ResponseEntity<?> createDishesList(@RequestBody List<CreateDish> dishes){
+        try {
+            List<Dish> created = service.createDishes(dishes);
+            return ResponseEntity.status(HttpStatus.CREATED).body(created);
+        } catch (DishAlreadyExistsException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
     }
 }
