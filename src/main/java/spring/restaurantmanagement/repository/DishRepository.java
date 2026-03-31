@@ -2,15 +2,10 @@ package spring.restaurantmanagement.repository;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Repository;
-import spring.restaurantmanagement.entity.CategoryEnum;
-import spring.restaurantmanagement.entity.Dish;
-import spring.restaurantmanagement.entity.Ingredient;
+import spring.restaurantmanagement.entity.*;
 
 import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -110,6 +105,87 @@ public class DishRepository {
         try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, dishId);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next();
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    Dish findDishById(Integer id) {
+        Connection connection = null;
+        try {
+            connection = dataSource.getConnection();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement(
+                    """
+                            select dish.id as dish_id, dish.name as dish_name, dish_type, dish.selling_price as selling_price
+                            from dish
+                            where dish.id = ?;
+                            """);
+            preparedStatement.setInt(1, id);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                Dish dish = new Dish();
+                dish.setId(resultSet.getInt("dish_id"));
+                dish.setName(resultSet.getString("dish_name"));
+                dish.setDishType(DishTypeEnum.valueOf(resultSet.getString("dish_type")));
+                dish.setSellingPrice(resultSet.getObject("selling_price") == null
+                        ? null : resultSet.getDouble("selling_price"));
+                return dish;
+            }
+            throw new RuntimeException("Dish not found " + id);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public List<Dish> saveDishes(List<CreateDish> toSave) {
+        String insertSql = """
+            INSERT INTO dish (name, dish_type, selling_price)
+            VALUES (?, ?::dish_type, ?)
+            RETURNING id
+            """;
+        List<Integer> ids = new ArrayList<>();
+        try (Connection conn = dataSource.getConnection()) {
+            conn.setAutoCommit(false);
+            try (PreparedStatement ps = conn.prepareStatement(insertSql)) {
+                for (CreateDish d : toSave) {
+                    ps.setString(1, d.getName());
+                    ps.setString(2, d.getDishType().name());
+                    if (d.getSellingPrice() != null) {
+                        ps.setDouble(3, d.getSellingPrice());
+                    } else {
+                        ps.setNull(3, Types.DOUBLE);
+                    }
+                    try (ResultSet rs = ps.executeQuery()) {
+                        if (rs.next()) {
+                            ids.add(rs.getInt(1));
+                        }
+                    }
+                }
+                conn.commit();
+            } catch (SQLException e) {
+                conn.rollback();
+                throw new RuntimeException(e);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return ids.stream()
+                .map(this::findDishById)
+                .toList();
+    }
+
+    public boolean dishNameExists(String name) {
+        String sql = "SELECT id FROM dish WHERE name = ?";
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, name);
             try (ResultSet rs = ps.executeQuery()) {
                 return rs.next();
             }
