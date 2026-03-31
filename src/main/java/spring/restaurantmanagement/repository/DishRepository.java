@@ -145,37 +145,47 @@ public class DishRepository {
     }
 
     public List<Dish> saveDishes(List<CreateDish> toSave) {
+        if (toSave == null || toSave.isEmpty()) {
+            return List.of();
+        }
+
         String insertSql = """
-            INSERT INTO dish (name, dish_type, selling_price)
-            VALUES (?, ?::dish_type, ?)
-            RETURNING id
-            """;
+        INSERT INTO dish (name, dish_type, selling_price)
+        VALUES (?, ?::dish_type, ?)
+        RETURNING id
+        """;
+
         List<Integer> ids = new ArrayList<>();
+
         try (Connection conn = dataSource.getConnection()) {
             conn.setAutoCommit(false);
-            try (PreparedStatement ps = conn.prepareStatement(insertSql)) {
-                for (CreateDish d : toSave) {
+
+            for (CreateDish d : toSave) {
+                try (PreparedStatement ps = conn.prepareStatement(insertSql)) {
+
                     ps.setString(1, d.getName());
                     ps.setString(2, d.getDishType().name());
+
                     if (d.getSellingPrice() != null) {
                         ps.setDouble(3, d.getSellingPrice());
                     } else {
                         ps.setNull(3, Types.DOUBLE);
                     }
+
                     try (ResultSet rs = ps.executeQuery()) {
                         if (rs.next()) {
-                            ids.add(rs.getInt(1));
+                            ids.add(rs.getInt("id"));
                         }
                     }
                 }
-                conn.commit();
-            } catch (SQLException e) {
-                conn.rollback();
-                throw new RuntimeException(e);
             }
+
+            conn.commit();
+
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+
         return ids.stream()
                 .map(this::findDishById)
                 .toList();
