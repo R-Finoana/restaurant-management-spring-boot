@@ -49,7 +49,7 @@ public class DishRepository {
 
         return dishes;
     }
-/*
+
     public List<Ingredient> findIngredientsByDishId(int dishId) {
         String sql = """
             select i.id, i.name, i.category, i.price
@@ -66,8 +66,6 @@ public class DishRepository {
             return ing;
         }, dishId);
     }
-
- */
 
     public void detachIngredients(Integer dishId) {
         String sql="DELETE FROM dish_ingredient WHERE id_dish = ?";
