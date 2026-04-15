@@ -61,6 +61,17 @@ paths:
               schema:
                 type: string
               example: Either mandatory query parameter 'at' or 'unit' is not provided
+  /dishes:
+    get:
+      responses:
+        200:
+          description: List of dishes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Dish"
 components:
   parameters:
     IngredientIdPathVariable:
@@ -122,6 +133,22 @@ components:
             - KG
             - L
           example: KG
+    Dish:
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: Poulet rôti
+        selling_price:
+          type: number
+          format: double
+          example: 3000.0
+        ingredients:
+          type: array
+          items:
+            - $ref: "#/components/schemas/Ingredient"
 
 
 
