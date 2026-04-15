@@ -1,0 +1,52 @@
+openapi: 3.1.0
+info:
+  title: Ingredients OAS
+  version: 1.0.0
+servers:
+  - url: 'http://localhost:8080'
+paths:
+  /ingredients:
+    get:
+      responses:
+        200:
+          description: List of ingredients
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Ingredient"
+components:
+  schemas:
+    Ingredient:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: laitue
+        category:
+          type: string
+          enum:
+            - vegetable
+            - animal
+            - marine
+            - dairy
+            - other
+          example: vegetable
+        price:
+          type: number
+          format: double
+          example: 800.0
+
+
+
+
+
+
+
+
+
+
