@@ -16,7 +16,7 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/Ingredient"
-  /ingredient/{id}:
+  /ingredients/{id}:
     get:
       parameters:
         - $ref: "#/components/parameters/IngredientIdPathVariable"
@@ -26,15 +26,41 @@ paths:
           content:
             application/json:
               schema:
-                items:
-                  $ref: "#/components/schemas/Ingredient"
+                $ref: "#/components/schemas/Ingredient"
         404:
           description: Ingredient not found
           content:
             text/plain:
               schema:
                 type: string
-                example: Ingredient not found
+              example: Ingredient not found
+  /ingredients/{id}/stock:
+    get:
+      parameters:
+        - $ref: "#/components/parameters/IngredientIdPathVariable"
+        - $ref: "#/components/parameters/AtQueryParameter"
+        - $ref: "#/components/parameters/UnitQueryParameter"
+      responses:
+        200:
+          description: Stock value at a specific date and unit
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StockValue"
+        404:
+          description: Ingredient id is not found
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: Ingredient id is not found
+        400:
+          description: Missing query parameter
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: Either mandatory query parameter 'at' or 'unit' is not provided
 components:
   parameters:
     IngredientIdPathVariable:
@@ -42,6 +68,23 @@ components:
       name: id
       schema:
         type: integer
+      required: true
+    AtQueryParameter:
+      in: query
+      name: at
+      schema:
+        type: string
+        format: date-time
+      required: true
+    UnitQueryParameter:
+      in: query
+      name: unit
+      schema:
+        type: string
+        enum:
+          - pcs
+          - kg
+          - l
       required: true
   schemas:
     Ingredient:
@@ -66,6 +109,19 @@ components:
           type: number
           format: double
           example: 800.0
+    StockValue:
+      properties:
+        quantity:
+          type: number
+          format: double
+          example: 5.0
+        unit:
+          type: string
+          enum:
+            - PCS
+            - KG
+            - L
+          example: KG
 
 
 
