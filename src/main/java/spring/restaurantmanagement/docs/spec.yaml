@@ -16,7 +16,33 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/Ingredient"
+  /ingredient/{id}:
+    get:
+      parameters:
+        - $ref: "#/components/parameters/IngredientIdPathVariable"
+      responses:
+        200:
+          description: Ingredient by id
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: "#/components/schemas/Ingredient"
+        404:
+          description: Ingredient not found
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: Ingredient not found
 components:
+  parameters:
+    IngredientIdPathVariable:
+      in: path
+      name: id
+      schema:
+        type: integer
+      required: true
   schemas:
     Ingredient:
       type: object
